@@ -12,6 +12,12 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.ts'],
+    alias: {
+      '@utils': path.resolve(__dirname, 'src/utils/'),
+      '@templates': path.resolve(__dirname, 'src/templates/'),
+      '@styles': path.resolve(__dirname, 'src/styles/'),
+      '@images': path.resolve(__dirname, 'src/assets/images/'),
+    },
   },
   module: {
     rules: [
@@ -26,6 +32,24 @@ module.exports = {
         test: /\.s?css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
+      {
+        test: /\.png/,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(woff|woff2)$/,
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 10000,
+            mimetype: 'application/font-woff',
+            name: '[name].[contenthash].[ext]',
+            outputPath: './assets/fonts/',
+            publicPath: './assets/fonts/',
+            esModule: false,
+          },
+        },
+      },
     ],
   },
   plugins: [
@@ -33,10 +57,13 @@ module.exports = {
       inject: true,
       template: './public/index.html',
     }),
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: 'assets/[name].[contenthash].css',
+    }),
     new CopyPlugin({
       patterns: [
         { from: path.resolve(__dirname, 'src', 'styles/'), to: 'styles/' },
+        { from: path.resolve(__dirname, 'src', 'assets/'), to: 'assets/' },
       ],
     }),
   ],
